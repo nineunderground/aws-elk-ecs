@@ -36,7 +36,7 @@ The ELK stack is setup in multicontainer and then running on ECS service.
 
 ## CLI
 
-TODO Open a console under same path as templates.
+Open a console under same path as templates.
 
 Files:
 * deployment/templates/ecs-deployment-host.yaml
@@ -50,7 +50,7 @@ You can create using:
 
 ##### EC2 Instance cluster
 ```
-aws --profile nc-inaki cloudformation deploy --template-file ecs-deployment-host.yaml --stack-name ecs-elk --parameter-overrides $(cat parameters.cfg) --capabilities CAPABILITY_NAMED_IAM
+aws --profile nc-inaki cloudformation deploy --template-file ecs-deployment-host.yaml --stack-name ecs-elk --parameter-overrides $(cat parameters-host.cfg) --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ##### Fargate Instance cluster
