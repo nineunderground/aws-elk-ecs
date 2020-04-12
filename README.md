@@ -12,7 +12,6 @@
 	5.1 [ElasticSearch cURL Commands](#ElasticSearch-cURL-Commands)
 
 	5.2	[DSL Queries](#DSL-Queries)
-6. [Golang](#Golang)
 ---
 
 ## Description
@@ -46,7 +45,7 @@ Files:
 
 #### Cloudformation
 
-You can create using:
+You can create using EC2 registered instance or Fargate:
 
 ##### EC2 Instance cluster
 ```
@@ -68,7 +67,7 @@ Before use Kibana, there is a requirement to create an index pattern. So, for th
 
 1. Create a temp variable. (Obviously this can be arranged with a permanent CNAME record on R53 service that points to the ELB DNS)
 ```
-ELASTICSEARCH=ecs-f-Appli-1TPVQ334OFN26-1505576480.eu-central-1.elb.amazonaws.com
+ELK_HOST=$(aws --profile MY-PROFILE cloudformation describe-stacks --stack-name ecs-elk --query Stacks[].Outputs[0].OutputValue | sed -n 2,2p | cut -b 6-71)
 ```
 
 2. Test the access url for Kibana frontend and Elasticsearch:
@@ -336,16 +335,3 @@ POST /vpclogs/_delete_by_query?pretty
   }
 }
 ```
-
----
-
-## Golang
-
-The aws-dump tool takes all files from a S3 bucket with given parameters (AWS account folder, date and log type) and fetch the result into Elasticsearch container. After that it should be visible on Kibana.
-
-The tool can be deployed as a lamda or run locally at path "deployment/lambda":
-```
-go run main.go <MFA-TOKEN>
-```
-
-Checkout the settings.properties to setup right values from your AWS account.
