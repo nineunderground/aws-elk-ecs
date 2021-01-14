@@ -100,13 +100,13 @@ cd /Users/inaki-office/Documents/development/vscode_workspaces/other/aws-elk-ecs
 go get /usr/local/Cellar/go/1.14/libexec/src/github.com/cheggaaa/pb
 
 # Pushing VPC flow logs data
-go run *.go 2021/01/05 IT-PROD LOG_VPC_FLOW_LOGS $ELASTICSEARCH upm
+go run *.go 2021/01/05 IT-PROD LOG_VPC_FLOW_LOGS $ELASTICSEARCH profile-name
 
 # Pushing CloudTrail logs data
-go run *.go 2021/01/10 IT-TEST LOG_CLOUDTRAIL_EVENTS $ELASTICSEARCH upm
+go run *.go 2021/01/10 IT-TEST LOG_CLOUDTRAIL_EVENTS $ELASTICSEARCH profile-name
 
 # Pushing Privx Kinesis logs data
-go run *.go 2021/01/12 SSEMEA LOG_KINESIS_SSH_LOGS $ELASTICSEARCH kone
+go run *.go 2021/01/12 SSEMEA LOG_KINESIS_SSH_LOGS $ELASTICSEARCH profile-name
 
 ```
 
