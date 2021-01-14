@@ -27,6 +27,8 @@ This AWS-ELK is just an ELK stack that utilizes the Elasticsearch to consume log
 ## Deployment
 The ELK stack is setup in multicontainer and then running on ECS service. 
 
+NOTE: Before you create anything, please check you have created a valid keypair like the one you need to specify in parameters file. Also, update the settings.properties file with valid values
+
 ---
 
 ## CLI
