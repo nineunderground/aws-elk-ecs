@@ -267,12 +267,6 @@ func runningUsingIAMUserProfile(req KibanaDataBulkRequest) {
 	fmt.Println("")
 
 	// Assume role
-	// var roleSession *session.Session
-	// if AWS_CUSTOMER_PROFILE_NAME == "upm" {
-	// 	roleSession = GetAssumedRoleSession(sessionCredens, "803523913631", "eu-central-1")
-	// } else if AWS_CUSTOMER_PROFILE_NAME == "kone" {
-	// 	roleSession = GetAssumedRoleSession(sessionCredens, "531322851491", "eu-central-1")
-	// }
 	if AWS_CUSTOMER_LANDING_ACCOUNT_ID == "" || AWS_CUSTOMER_LANDING_REGION_CODE == "" {
 		fmt.Println("Landing settings error")
 		os.Exit(4)
