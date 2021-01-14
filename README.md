@@ -48,8 +48,6 @@ You can create using EC2 registered instance or Fargate:
 ##### EC2 Instance cluster
 ```
 aws --profile nc-inaki cloudformation deploy --template-file ecs-deployment-host.yaml --stack-name ecs-elk --parameter-overrides $(cat parameters-host.cfg) --capabilities CAPABILITY_NAMED_IAM
-
-aws --profile nc-inaki cloudformation deploy --template-file ecs-deployment-host-demo.yaml --stack-name ecs-elk-demo --parameter-overrides $(cat parameters-host-demo.cfg) --capabilities CAPABILITY_NAMED_IAM
 ```
 
 ##### Fargate Instance cluster
@@ -68,8 +66,6 @@ Before use Kibana, there is a requirement to create an index pattern. So, for th
 1. Create a temp variable. (Obviously this can be arranged with a permanent CNAME record on R53 service that points to the ELB DNS)
 ```
 ELASTICSEARCH=$(aws --profile nc-inaki cloudformation describe-stacks --stack-name ecs-elk | jq -r ".Stacks[].Outputs[] | select(.OutputKey==\"PublicURL\") | .OutputValue")
-
-ELASTICSEARCH=$(aws --profile nc-inaki cloudformation describe-stacks --stack-name ecs-elk-demo | jq -r ".Stacks[].Outputs[] | select(.OutputKey==\"PublicURL\") | .OutputValue")
 ```
 
 2. Test the access url for Kibana frontend and Elasticsearch:
@@ -87,17 +83,21 @@ open http://$ELASTICSEARCH
 curl $ELASTICSEARCH:9200/vpclogs?pretty -H 'Content-Type: application/json' -d'{"mappings": {"doc": {"properties": {"account-id": {"type": "long"},"protocol": {"type": "integer"},"srcaddr": {"type": "keyword"},"dstaddr": {"type": "keyword"},"start": {"type": "date"},"end": {"type": "date"}}}}}' -XPUT
 ```
 
-3.2 Create CloudTraillogs index (NOTE: Not needed)
+3.2 Create CloudTraillogs index:
+(NOTE Not needed as CloudTrails index will be created from golang script correctly)
 
-3.3 Create Kinesis logs index
+3.3 Create Kinesis logs index:
 ```
 curl $ELASTICSEARCH:9200/kinesislogs?pretty -H 'Content-Type: application/json' -d'{"mappings": {"doc": {"properties": {"id": {"type": "integer"},"s3filename": {"type": "keyword"},"instanceId": {"type": "keyword"},"logdate": {"type": "date"},"logdateDesc": {"type": "keyword"},"hostname": {"type": "keyword"},"description": {"type": "keyword"}}}}}' -XPUT
 ```
 
-4. Now everything is ready to dump data. Checkout [Golang](#Golang)
+4. Now everything is ready to dump data:
 
 ```
 cd /Users/inaki-office/Documents/development/vscode_workspaces/other/aws-elk-ecs-master/data-wrapper
+
+# Install go sdk if needed, then run:
+go get /usr/local/Cellar/go/1.14/libexec/src/github.com/cheggaaa/pb
 
 # Pushing VPC flow logs data
 go run *.go 2021/01/05 IT-PROD LOG_VPC_FLOW_LOGS $ELASTICSEARCH upm
@@ -113,26 +113,9 @@ go run *.go 2021/01/12 SSEMEA LOG_KINESIS_SSH_LOGS $ELASTICSEARCH kone
 5. Create index pattern:
 
 ```
-open http://$ELASTICSEARCH
-
 curl -X POST http://$ELASTICSEARCH/api/saved_objects/index-pattern -H 'kbn-xsrf: reporting' -H 'Content-Type: application/json' -d' {"attributes":{"title":"vpclogs*","timeFieldName":"start"}}'
 
 curl -X POST http://$ELASTICSEARCH/api/saved_objects/index-pattern -H 'kbn-xsrf: reporting' -H 'Content-Type: application/json' -d' {"attributes":{"title":"cloudtraillogs*","timeFieldName":"eventTime"}}'
-
-curl -X POST $ELASTICSEARCH/api/saved_objects/index-pattern/vpclogs -H 'Content-Type: application/json' -d'
-{
-  "attributes": {
-    "title": "vpc*",
-    "timeFieldName":"start"
-  }
-}
-```
-
-
-```
-go get /usr/local/Cellar/go/1.14/libexec/src/github.com/cheggaaa/pb
-go run *.go 2021/01/05 IT-PROD LOG_CLOUDTRAIL_EVENTS $ELASTICSEARCH
-go run *.go 2021/01/12 SSEMEA LOG_KINESIS_SSH_LOGS $ELASTICSEARCH
 ```
 
 6. Sending other logs
@@ -149,10 +132,10 @@ sudo rpm -vi filebeat-6.8.8-x86_64.rpm
 
 # Modify /etc/filebeat/filebeat.yml with:
 kibana config:
-host: "http://ecs-e-appli-sq2khqaksv7t-60621908.eu-central-1.elb.amazonaws.com:80"
+host: "http://<REPLACE-YOUR-LOADL-BALANCER-URL-HERE>:80"
 
 elasticsearch config:
-hosts: ["ecs-e-appli-sq2khqaksv7t-60621908.eu-central-1.elb.amazonaws.com:9200"]
+hosts: ["<REPLACE-YOUR-LOADL-BALANCER-URL-HERE>:9200"]
 rotocol: "http"
 
 # Setup & run:
