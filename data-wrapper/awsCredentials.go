@@ -18,6 +18,9 @@ import (
 var SettingsMap map[string]string
 var TagsMap map[string]string = make(map[string]string)
 
+var AWS_CUSTOMER_LANDING_ACCOUNT_ID string
+var AWS_CUSTOMER_LANDING_REGION_CODE string
+
 /*
 * Create the accountmap with all AWS account IDs
  */
@@ -44,7 +47,14 @@ func InitializeSettings() {
 		if isFound {
 			if lineWords[0] == "AWS_LOCAL_MFA_USER_PROFILE" {
 				AWS_LOCAL_MFA_USER_PROFILE = lineWords[1]
-				fmt.Println("ReqSessionCredens... lineWords[1]" + lineWords[1])
+				continue
+			}
+			if lineWords[0] == "AWS_CUSTOMER_LANDING_ACCOUNT_ID" {
+				AWS_CUSTOMER_LANDING_ACCOUNT_ID = lineWords[1]
+				continue
+			}
+			if lineWords[0] == "AWS_CUSTOMER_LANDING_REGION_CODE" {
+				AWS_CUSTOMER_LANDING_REGION_CODE = lineWords[1]
 				continue
 			}
 			if lineWords[0] == "AWS_IAM_ROLE_NAME_TO_BE_ASSUMED" {
